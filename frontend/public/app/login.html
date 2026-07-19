@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login - Smart Complaint System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-hero">
+    <div class="logo"><i class="fa-solid fa-city"></i> Smart City Portal</div>
+    <h1>Report civic issues, build a better city.</h1>
+    <p>A unified platform for citizens and administrators to report, track and resolve civic complaints in real time.</p>
+    <div class="auth-features">
+      <div><i class="fa-solid fa-bolt"></i> Fast complaint registration</div>
+      <div><i class="fa-solid fa-chart-line"></i> Real-time tracking & updates</div>
+      <div><i class="fa-solid fa-shield-halved"></i> Secure & transparent process</div>
+    </div>
+  </div>
+  <div class="auth-card-wrap">
+    <div class="auth-card">
+      <h2>Welcome back</h2>
+      <p class="sub">Sign in to your account to continue</p>
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Email address</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="••••••••" required />
+          </div>
+        </div>
+        <div class="form-group" style="display:flex;justify-content:space-between;align-items:center;font-size:12px;">
+          <label style="display:flex;align-items:center;gap:6px;font-weight:400;">
+            <input type="checkbox" /> Remember me
+          </label>
+          <a href="#">Forgot password?</a>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign in
+        </button>
+        <button class="btn btn-outline btn-block" type="button" style="margin-top:10px;" onclick="location.href='admin-dashboard.html'">
+          <i class="fa-solid fa-user-shield"></i> Continue as Admin
+        </button>
+      </form>
+      <div class="auth-foot">
+        Don't have an account? <a href="register.html">Create one</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  fakeLogin(document.getElementById('email').value);
+  window.location.href = 'user-dashboard.html';
+});
+</script>
+</body>
+</html>

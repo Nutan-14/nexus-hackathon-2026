@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Complaint Details - Smart Complaint System</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-city"></i> Smart City</div>
+    <div class="side-label">Main</div>
+    <a href="user-dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a href="register-complaint.html"><i class="fa-solid fa-plus-circle"></i> Register Complaint</a>
+    <a href="complaint-history.html" class="active"><i class="fa-solid fa-clock-rotate-left"></i> My Complaints</a>
+    <div class="side-label">Account</div>
+    <a href="#"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search..." /></div>
+      <div class="top-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+        <div class="avatar">U</div>
+      </div>
+    </div>
+    <div class="content" id="page"></div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const id = new URLSearchParams(location.search).get('id');
+const list = loadComplaints();
+const c = list.find(x => x.id === id) || list[0];
+const page = document.getElementById('page');
+
+if (!c) {
+  page.innerHTML = `<div class="card">Complaint not found.</div>`;
+} else {
+  page.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h1>${c.title}</h1>
+        <p><span class="cid" style="color:var(--primary);font-weight:600;">${c.id}</span> • Registered on ${formatDate(c.date)}</p>
+      </div>
+      <a href="complaint-history.html" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    </div>
+    <div class="detail-grid">
+      <div>
+        <div class="card">
+          <div class="card-head">
+            <h3>Complaint Details</h3>
+            ${statusBadge(c.status)}
+          </div>
+          <p style="color:var(--muted);line-height:1.7;">${c.description}</p>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Status Timeline</h3></div>
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-title">Complaint Registered</div>
+              <div class="tl-time">${formatDate(c.date)} • 10:24 AM</div>
+            </div>
+            <div class="tl-item">
+              <div class="tl-title">Assigned to Field Officer</div>
+              <div class="tl-time">${formatDate(c.date)} • 02:15 PM</div>
+            </div>
+            ${c.status !== 'Open' ? `
+            <div class="tl-item">
+              <div class="tl-title">Investigation In Progress</div>
+              <div class="tl-time">Team dispatched to location</div>
+            </div>` : ''}
+            ${c.status === 'Resolved' ? `
+            <div class="tl-item">
+              <div class="tl-title">Issue Resolved ✓</div>
+              <div class="tl-time">Marked as resolved by admin</div>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-head"><h3>Information</h3></div>
+          <div class="info-row"><span class="label">Category</span><span class="value">${catBadge(c.category)}</span></div>
+          <div class="info-row"><span class="label">Status</span><span class="value">${statusBadge(c.status)}</span></div>
+          <div class="info-row"><span class="label">Priority</span><span class="value">${c.priority}</span></div>
+          <div class="info-row"><span class="label">Location</span><span class="value">${c.location}</span></div>
+          <div class="info-row"><span class="label">Reported by</span><span class="value">${c.user}</span></div>
+          <div class="info-row"><span class="label">Date</span><span class="value">${formatDate(c.date)}</span></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Actions</h3></div>
+          <button class="btn btn-primary btn-block" style="margin-bottom:8px;"><i class="fa-solid fa-message"></i> Add Comment</button>
+          <button class="btn btn-outline btn-block"><i class="fa-solid fa-share-nodes"></i> Share</button>
+        </div>
+      </div>
+    </div>`;
+}
+</script>
+</body>
+</html>

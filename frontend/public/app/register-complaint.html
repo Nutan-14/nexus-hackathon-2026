@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register Complaint - Smart Complaint System</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-city"></i> Smart City</div>
+    <div class="side-label">Main</div>
+    <a href="user-dashboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a href="register-complaint.html" class="active"><i class="fa-solid fa-plus-circle"></i> Register Complaint</a>
+    <a href="complaint-history.html"><i class="fa-solid fa-clock-rotate-left"></i> My Complaints</a>
+    <div class="side-label">Account</div>
+    <a href="#"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Search..." /></div>
+      <div class="top-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i></button>
+        <div class="avatar">U</div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-head">
+        <div>
+          <h1>Register a Complaint</h1>
+          <p>Fill in the details below. All fields marked * are required.</p>
+        </div>
+        <a href="user-dashboard.html" class="btn btn-outline"><i class="fa-solid fa-arrow-left"></i> Back</a>
+      </div>
+
+      <form id="complaintForm">
+        <div class="card">
+          <div class="card-head"><h3>1. Select Category *</h3></div>
+          <div class="cat-grid" id="catGrid"></div>
+          <input type="hidden" id="category" required />
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>2. Complaint Details</h3></div>
+          <div class="form-group">
+            <label>Title *</label>
+            <input type="text" id="title" placeholder="Short summary of the issue" required />
+          </div>
+          <div class="form-group">
+            <label>Description *</label>
+            <textarea id="description" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+              <label>Location *</label>
+              <input type="text" id="location" placeholder="Area / street / landmark" required />
+            </div>
+            <div class="form-group">
+              <label>Priority</label>
+              <select id="priority">
+                <option>Low</option><option selected>Medium</option><option>High</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Upload Photo (optional)</label>
+            <input type="file" accept="image/*" />
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;justify-content:flex-end;">
+          <button type="button" class="btn btn-outline" onclick="history.back()">Cancel</button>
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Submit Complaint</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const grid = document.getElementById('catGrid');
+grid.innerHTML = CATEGORIES.map(c => `
+  <div class="cat-item" data-cat="${c.key}">
+    <i class="fa-solid ${c.icon}"></i>
+    <span>${c.key}</span>
+  </div>`).join('');
+
+const preset = new URLSearchParams(location.search).get('cat');
+function selectCat(key) {
+  document.getElementById('category').value = key;
+  grid.querySelectorAll('.cat-item').forEach(el => {
+    el.classList.toggle('selected', el.dataset.cat === key);
+  });
+}
+grid.querySelectorAll('.cat-item').forEach(el => el.addEventListener('click', () => selectCat(el.dataset.cat)));
+if (preset) selectCat(preset);
+
+document.getElementById('complaintForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const cat = document.getElementById('category').value;
+  if (!cat) { alert('Please select a category'); return; }
+  const list = loadComplaints();
+  const newId = 'CMP-' + (1024 + list.length + 1);
+  list.unshift({
+    id: newId,
+    title: document.getElementById('title').value,
+    category: cat,
+    status: 'Open',
+    date: new Date().toISOString().slice(0, 10),
+    location: document.getElementById('location').value,
+    priority: document.getElementById('priority').value,
+    user: (JSON.parse(localStorage.getItem('user')||'{}').name)||'You',
+    description: document.getElementById('description').value,
+  });
+  saveComplaints(list);
+  alert('Complaint submitted successfully! ID: ' + newId);
+  window.location.href = 'complaint-history.html';
+});
+</script>
+</body>
+</html>

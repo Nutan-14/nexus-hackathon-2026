@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin Dashboard - Smart Complaint System</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-city"></i> Smart City</div>
+    <div class="side-label">Admin</div>
+    <a href="admin-dashboard.html" class="active"><i class="fa-solid fa-gauge"></i> Overview</a>
+    <a href="#"><i class="fa-solid fa-file-lines"></i> All Complaints</a>
+    <a href="#"><i class="fa-solid fa-users"></i> Users</a>
+    <a href="#"><i class="fa-solid fa-tags"></i> Categories</a>
+    <a href="#"><i class="fa-solid fa-chart-column"></i> Reports</a>
+    <div class="side-label">System</div>
+    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="user-dashboard.html"><i class="fa-solid fa-user"></i> User View</a>
+    <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="searchInput" type="text" placeholder="Search complaints..." /></div>
+      <div class="top-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i><span class="dot"></span></button>
+        <div class="user-block">
+          <div class="avatar" style="background:linear-gradient(135deg,#dc2626,#991b1b);">A</div>
+          <div>
+            <div class="name">Admin</div>
+            <div class="role">Administrator</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-head">
+        <div>
+          <h1>Admin Dashboard</h1>
+          <p>Manage all civic complaints and monitor city-wide activity.</p>
+        </div>
+        <button class="btn btn-primary"><i class="fa-solid fa-file-export"></i> Export Report</button>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h3>All Complaints</h3>
+            <select id="statusFilter" style="padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:inherit;">
+              <option value="">All Status</option><option>Open</option><option>In Progress</option><option>Resolved</option>
+            </select>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Title</th><th>Category</th><th>User</th><th>Status</th><th>Action</th></tr>
+              </thead>
+              <tbody id="tbl"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Complaints by Category</h3></div>
+          <div id="catStats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const list = loadComplaints();
+const stats = [
+  { label: 'Total Complaints', value: list.length, icon: 'fa-file-lines', cls: '' },
+  { label: 'Open', value: list.filter(c => c.status === 'Open').length, icon: 'fa-circle-exclamation', cls: 'red' },
+  { label: 'In Progress', value: list.filter(c => c.status === 'In Progress').length, icon: 'fa-spinner', cls: 'orange' },
+  { label: 'Resolved', value: list.filter(c => c.status === 'Resolved').length, icon: 'fa-circle-check', cls: 'green' },
+];
+document.getElementById('stats').innerHTML = stats.map(s => `
+  <div class="stat-card">
+    <div class="stat-icon ${s.cls}"><i class="fa-solid ${s.icon}"></i></div>
+    <div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>
+  </div>`).join('');
+
+function statusOptions(current) {
+  return STATUSES.map(s => `<option ${s===current?'selected':''}>${s}</option>`).join('');
+}
+
+function render() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const s = document.getElementById('statusFilter').value;
+  const filt = loadComplaints().filter(x =>
+    (!s || x.status === s) &&
+    (!q || x.title.toLowerCase().includes(q) || x.id.toLowerCase().includes(q))
+  );
+  document.getElementById('tbl').innerHTML = filt.map(x => `
+    <tr>
+      <td><span class="cid">${x.id}</span></td>
+      <td>${x.title}</td>
+      <td>${catBadge(x.category)}</td>
+      <td>${x.user}</td>
+      <td>
+        <select data-id="${x.id}" class="statusSel" style="padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:12px;">
+          ${statusOptions(x.status)}
+        </select>
+      </td>
+      <td><a href="complaint-details.html?id=${x.id}" class="btn btn-outline btn-sm"><i class="fa-solid fa-eye"></i></a></td>
+    </tr>`).join('');
+  document.querySelectorAll('.statusSel').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const all = loadComplaints();
+      const item = all.find(a => a.id === sel.dataset.id);
+      if (item) { item.status = sel.value; saveComplaints(all); render(); }
+    });
+  });
+}
+document.getElementById('searchInput').addEventListener('input', render);
+document.getElementById('statusFilter').addEventListener('change', render);
+render();
+
+// Category breakdown
+const total = list.length || 1;
+document.getElementById('catStats').innerHTML = CATEGORIES.map(c => {
+  const n = list.filter(x => x.category === c.key).length;
+  const pct = Math.round((n/total)*100);
+  return `
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px;">
+        <span><i class="fa-solid ${c.icon}" style="color:var(--primary);margin-right:6px;"></i>${c.key}</span>
+        <span style="color:var(--muted);">${n}</span>
+      </div>
+      <div style="height:6px;background:var(--bg);border-radius:99px;overflow:hidden;">
+        <div style="height:100%;background:linear-gradient(90deg,var(--primary),var(--primary-dark));width:${pct}%;transition:width .4s;"></div>
+      </div>
+    </div>`;
+}).join('');
+</script>
+</body>
+</html>

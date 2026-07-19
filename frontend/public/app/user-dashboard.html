@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>User Dashboard - Smart Complaint System</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><i class="fa-solid fa-city"></i> Smart City</div>
+    <div class="side-label">Main</div>
+    <a href="user-dashboard.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+    <a href="register-complaint.html"><i class="fa-solid fa-plus-circle"></i> Register Complaint</a>
+    <a href="complaint-history.html"><i class="fa-solid fa-clock-rotate-left"></i> My Complaints</a>
+    <div class="side-label">Account</div>
+    <a href="#"><i class="fa-solid fa-user"></i> Profile</a>
+    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+    <a href="#" data-logout><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+    <div class="side-label">Admin</div>
+    <a href="admin-dashboard.html"><i class="fa-solid fa-user-shield"></i> Admin Panel</a>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <button class="hamburger"><i class="fa-solid fa-bars"></i></button>
+      <div class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" placeholder="Search complaints, categories..." />
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn"><i class="fa-regular fa-bell"></i><span class="dot"></span></button>
+        <div class="user-block">
+          <div class="avatar" id="avatar">U</div>
+          <div>
+            <div class="name" id="userName">User</div>
+            <div class="role">Citizen</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="content">
+      <div class="page-head">
+        <div>
+          <h1>Welcome back <span id="hi"></span> 👋</h1>
+          <p>Here's an overview of your complaints and activity.</p>
+        </div>
+        <a href="register-complaint.html" class="btn btn-primary"><i class="fa-solid fa-plus"></i> New Complaint</a>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h3>Recent Complaints</h3>
+            <a href="complaint-history.html" class="btn btn-outline btn-sm">View all</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Title</th><th>Category</th><th>Date</th><th>Status</th></tr>
+              </thead>
+              <tbody id="recentTable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Quick Categories</h3></div>
+          <div class="cat-grid" id="quickCats"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const user = JSON.parse(localStorage.getItem('user') || '{"name":"Citizen","email":"user@city.com"}');
+document.getElementById('userName').textContent = user.name;
+document.getElementById('avatar').textContent = user.name.charAt(0).toUpperCase();
+document.getElementById('hi').textContent = user.name;
+
+const list = loadComplaints();
+const stats = [
+  { label: 'Total Complaints', value: list.length, icon: 'fa-file-lines', cls: '' },
+  { label: 'Open', value: list.filter(c => c.status === 'Open').length, icon: 'fa-circle-exclamation', cls: 'red' },
+  { label: 'In Progress', value: list.filter(c => c.status === 'In Progress').length, icon: 'fa-spinner', cls: 'orange' },
+  { label: 'Resolved', value: list.filter(c => c.status === 'Resolved').length, icon: 'fa-circle-check', cls: 'green' },
+];
+document.getElementById('stats').innerHTML = stats.map(s => `
+  <div class="stat-card">
+    <div class="stat-icon ${s.cls}"><i class="fa-solid ${s.icon}"></i></div>
+    <div>
+      <div class="stat-value">${s.value}</div>
+      <div class="stat-label">${s.label}</div>
+    </div>
+  </div>`).join('');
+
+document.getElementById('recentTable').innerHTML = list.slice(0, 5).map(c => `
+  <tr onclick="location.href='complaint-details.html?id=${c.id}'" style="cursor:pointer;">
+    <td><span class="cid">${c.id}</span></td>
+    <td>${c.title}</td>
+    <td>${catBadge(c.category)}</td>
+    <td>${formatDate(c.date)}</td>
+    <td>${statusBadge(c.status)}</td>
+  </tr>`).join('');
+
+document.getElementById('quickCats').innerHTML = CATEGORIES.map(c => `
+  <div class="cat-item" onclick="location.href='register-complaint.html?cat=${encodeURIComponent(c.key)}'">
+    <i class="fa-solid ${c.icon}"></i>
+    <span>${c.key}</span>
+  </div>`).join('');
+</script>
+</body>
+</html>

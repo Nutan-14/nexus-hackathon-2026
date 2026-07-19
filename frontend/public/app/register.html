@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Register - Smart Complaint System</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-hero">
+    <div class="logo"><i class="fa-solid fa-city"></i> Smart City Portal</div>
+    <h1>Join thousands of citizens making a difference.</h1>
+    <p>Create an account to register complaints, track their status, and contribute to a smarter city.</p>
+    <div class="auth-features">
+      <div><i class="fa-solid fa-user-plus"></i> Quick registration in seconds</div>
+      <div><i class="fa-solid fa-bell"></i> Get updates on your complaints</div>
+      <div><i class="fa-solid fa-people-group"></i> Community-driven solutions</div>
+    </div>
+  </div>
+  <div class="auth-card-wrap">
+    <div class="auth-card">
+      <h2>Create account</h2>
+      <p class="sub">Fill your details to get started</p>
+      <form id="regForm">
+        <div class="form-group">
+          <label>Full name</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="name" placeholder="John Doe" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Email address</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Phone number</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-phone"></i>
+            <input type="tel" id="phone" placeholder="+91 98765 43210" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-icon">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="Create a strong password" required />
+          </div>
+        </div>
+        <button class="btn btn-primary btn-block" type="submit">
+          <i class="fa-solid fa-user-plus"></i> Create account
+        </button>
+      </form>
+      <div class="auth-foot">
+        Already have an account? <a href="login.html">Sign in</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+document.getElementById('regForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  fakeLogin(document.getElementById('email').value);
+  window.location.href = 'user-dashboard.html';
+});
+</script>
+</body>
+</html>
